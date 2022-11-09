@@ -5,8 +5,6 @@
 """
 
 import copy
-import csv
-
 import numpy as np
 
 
@@ -114,112 +112,7 @@ class Agent(object):
         return param_list
 
 
-class SymmetryGame(object):
-    def __init__(
-            self,
-            game_mode,
-            is_sample_action=False,
-            is_BR=True,
-            eta=1,
-            is_using_history_regret=True,
-            is_regret_plus=True,
-            policy_update_mode='Fictitious'
-    ):
-        if game_mode == 'RPS':
-            self.game_matrix = np.array(
-                [
-                    [0, 1, -1],
-                    [-1, 0, 1],
-                    [1, -1, 0]
-                ]
-            )
-            self.action_num = 3
-        else:
-            self.game_matrix = np.random.random((game_mode, game_mode))
-            for i in range(game_mode):
-                self.game_matrix[i, i] = 0
-                for j in range(i, game_mode):
-                    self.game_matrix[i, j] = -self.game_matrix[j, i]
-            self.action_num = game_mode
-
-        self.player = Agent(
-            self.action_num,
-            is_sample_action,
-            is_BR,
-            eta,
-            is_using_history_regret,
-            is_regret_plus,
-            policy_update_mode
-        )
-
-    def iteration(self, iter_time):
-        for _ in range(iter_time):
-            interaction_policy = self.player.get_interaction_policy()
-            action_value = np.matmul(self.game_matrix, interaction_policy.reshape((-1, 1)))
-            action_value = action_value.reshape(-1)
-            self.player.get_update_policy(action_value)
-            self.player.policy_updates()
-
-    def get_epsilon(self, mode='his'):
-        if mode == 'his':
-            action_value = np.matmul(self.player.get_history_policy(), self.game_matrix)
-            game_v = np.sum(action_value * self.player.get_history_policy())
-        elif mode == 'now':
-            action_value = np.matmul(self.player.policy, self.game_matrix)
-            game_v = np.sum(action_value * self.player.policy)
-        else:
-            action_value = None
-            game_v = 0
-        epsilon = -np.min(action_value) - game_v
-        return epsilon
 
 
-if __name__ == '__main__':
-    is_sample_action_list = [True, False]
-    is_BR_list = [False]
-    eta_list = [0, 0.5, 1, 2, 5]
-    is_using_history_regret_list = [True, False]
-    is_regret_plus_list = [True, False]
-    policy_update_mode_list = ['Naive', 'Fictitious']
 
-    # is_sample_action_list = [False]
-    # is_BR_list = [False]
-    # eta_list = [1]
-    # is_using_history_regret_list = [False]
-    # is_regret_plus_list = [False]
-    # policy_update_mode_list = ['Naive']
 
-    param_combination = [(x1, x2, x3, x4, x5, x6) for x1 in is_sample_action_list for x2 in is_BR_list for x3 in
-                         eta_list for x4 in is_using_history_regret_list for x5 in is_regret_plus_list for x6 in
-                         policy_update_mode_list]
-
-    for act_len in [2, 4, 6, 8, 10]:
-        print(act_len)
-        for param in param_combination:
-            print(param)
-            recode_list = []
-            his_epsilon_list = []
-            now_epsilon_list = []
-            for _ in range(20):
-                rps = SymmetryGame(
-                    game_mode=2,
-                    is_sample_action=param[0],
-                    is_BR=param[1],
-                    eta=param[2],
-                    is_using_history_regret=param[3],
-                    is_regret_plus=param[4],
-                    policy_update_mode=param[5]
-                )
-                if not recode_list:
-                    recode_list.extend(rps.player.get_setting())
-
-                rps.iteration(1000)
-                his_epsilon_list.append(rps.get_epsilon('his'))
-                now_epsilon_list.append(rps.get_epsilon('now'))
-
-            recode_list.append(np.mean(now_epsilon_list))
-            recode_list.append(np.mean(his_epsilon_list))
-
-            with open('log/'+str(act_len)+'x'+str(act_len)+'_game.csv', 'a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(recode_list)
