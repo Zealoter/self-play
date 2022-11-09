@@ -193,31 +193,33 @@ if __name__ == '__main__':
                          eta_list for x4 in is_using_history_regret_list for x5 in is_regret_plus_list for x6 in
                          policy_update_mode_list]
 
-    for param in param_combination:
-        print(param)
-        recode_list = []
-        his_epsilon_list = []
-        now_epsilon_list = []
-        for _ in range(20):
-            rps = SymmetryGame(
-                game_mode=2,
-                is_sample_action=param[0],
-                is_BR=param[1],
-                eta=param[2],
-                is_using_history_regret=param[3],
-                is_regret_plus=param[4],
-                policy_update_mode=param[5]
-            )
-            if not recode_list:
-                recode_list.extend(rps.player.get_setting())
+    for act_len in [2, 4, 6, 8, 10]:
+        print(act_len)
+        for param in param_combination:
+            print(param)
+            recode_list = []
+            his_epsilon_list = []
+            now_epsilon_list = []
+            for _ in range(20):
+                rps = SymmetryGame(
+                    game_mode=2,
+                    is_sample_action=param[0],
+                    is_BR=param[1],
+                    eta=param[2],
+                    is_using_history_regret=param[3],
+                    is_regret_plus=param[4],
+                    policy_update_mode=param[5]
+                )
+                if not recode_list:
+                    recode_list.extend(rps.player.get_setting())
 
-            rps.iteration(1000)
-            his_epsilon_list.append(rps.get_epsilon('his'))
-            now_epsilon_list.append(rps.get_epsilon('now'))
+                rps.iteration(1000)
+                his_epsilon_list.append(rps.get_epsilon('his'))
+                now_epsilon_list.append(rps.get_epsilon('now'))
 
-        recode_list.append(np.mean(now_epsilon_list))
-        recode_list.append(np.mean(his_epsilon_list))
+            recode_list.append(np.mean(now_epsilon_list))
+            recode_list.append(np.mean(his_epsilon_list))
 
-        with open('result.csv', 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(recode_list)
+            with open('log/'+str(act_len)+'x'+str(act_len)+'_game.csv', 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(recode_list)
