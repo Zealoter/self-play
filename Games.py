@@ -18,7 +18,7 @@ class ZeroSumGame(object):
             is_regret_plus=True,
             policy_update_mode='Fictitious'
     ):
-        self.game_matrix = np.random.random((action_len, action_len))
+        self.game_matrix = np.random.randn(action_len, action_len)
         self.action_num = action_len
         self.player1 = Agent(
             self.action_num,
