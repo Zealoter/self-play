@@ -32,6 +32,8 @@ if __name__ == '__main__':
             recode_list = []
             his_epsilon_list = []
             now_epsilon_list = []
+            his_value_list = []
+            now_value_list = []
             for _ in range(100):
                 game = FullCooperationGame(
                     action_len=act_len,
@@ -48,10 +50,13 @@ if __name__ == '__main__':
                 game.iteration(1000)
                 his_epsilon_list.append(game.get_epsilon('his'))
                 now_epsilon_list.append(game.get_epsilon('now'))
+                his_value_list.append(game.get_value('his'))
+                now_value_list.append(game.get_value('now'))
 
             recode_list.append(np.mean(now_epsilon_list))
             recode_list.append(np.mean(his_epsilon_list))
-
+            recode_list.append(np.mean(now_value_list))
+            recode_list.append(np.mean(his_value_list))
             log_path = ''.join(['log/', game.name, '/', str(act_len), 'x', str(act_len), '_game.csv'])
             with open(log_path, 'a', newline='') as f:
                 writer = csv.writer(f)
