@@ -8,24 +8,24 @@ import numpy as np
 from Games import FullCooperationGame, ZeroSumGame, SymmetryGame
 
 if __name__ == '__main__':
-    # is_sample_action_list = [False]
+    # is_sample_action_list = [True]
     # is_BR_list = [False]
-    # eta_list = [1]
-    # is_using_history_regret_list = [False]
+    # eta_list = [-1]
+    # is_using_history_regret_list = [True]
     # is_regret_plus_list = [False]
     # policy_update_mode_list = ['Naive']
 
     is_sample_action_list = [True, False]
     is_BR_list = [False]
-    eta_list = [0, 1, 10]
+    eta_list = [-1, 1]
     is_using_history_regret_list = [True, False]
-    is_regret_plus_list = [True, False]
+    is_regret_plus_list = [False]
     policy_update_mode_list = ['Naive', 'Fictitious']
     param_combination = [
         (x1, x2, x3, x4, x5, x6) for x1 in is_sample_action_list for x2 in is_BR_list for x3 in eta_list for x4 in
         is_using_history_regret_list for x5 in is_regret_plus_list for x6 in policy_update_mode_list
     ]
-    for act_len in [2, 4, 10]:
+    for act_len in [1000]:
         print(act_len)
         for param in param_combination:
             print(param)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
             now_epsilon_list = []
             his_value_list = []
             now_value_list = []
-            for _ in range(100):
+            for _ in range(1):
                 game = FullCooperationGame(
                     action_len=act_len,
                     is_sample_action=param[0],
@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 if not recode_list:
                     recode_list.extend(game.player1.get_setting())
 
-                game.iteration(1000)
+                game.iteration(10000)
                 his_epsilon_list.append(game.get_epsilon('his'))
                 now_epsilon_list.append(game.get_epsilon('now'))
                 his_value_list.append(game.get_value('his'))

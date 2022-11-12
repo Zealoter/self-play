@@ -153,7 +153,6 @@ class FullCooperationGame(object):
         return game_v
 
 
-
 class SymmetryGame(object):
     def __init__(
             self,

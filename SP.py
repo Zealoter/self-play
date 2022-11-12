@@ -33,6 +33,7 @@ class Agent(object):
         """
         self.action_num = action_num
         self.policy = np.random.random(self.action_num)
+        # self.policy = np.ones(self.action_num)
         self.policy = self.policy / np.sum(self.policy)
         self.history_policy = copy.deepcopy(self.policy)
         self.train_times = 1
@@ -85,9 +86,13 @@ class Agent(object):
             else:
                 if self.eta == 0:
                     tmp_cal_regret[tmp_cal_regret > 0] = 1
+                elif self.eta < 0:
+                    tmp_cal_regret[tmp_cal_regret > 0] = np.power(tmp_cal_regret[tmp_cal_regret > 0], self.eta)
+
                 else:
                     tmp_cal_regret = np.power(tmp_cal_regret, self.eta)
-
+                if self.eta < 1:
+                    self.eta += 0.01
                 self.update_policy = tmp_cal_regret / np.sum(tmp_cal_regret)
 
     def policy_updates(self):
