@@ -75,6 +75,84 @@ class ZeroSumGame(object):
         return epsilon
 
 
+class ThreePlayerZeroSumGame(object):
+    def __init__(
+            self,
+            action_len,
+            is_sample_action=False,
+            is_BR=True,
+            eta=1,
+            is_using_history_regret=True,
+            is_regret_plus=True,
+            policy_update_mode='Fictitious'
+    ):
+        self.name = 'zero_sum'
+        self.game_matrix = np.random.randn(action_len, action_len)
+        self.action_len = action_len
+        self.player1 = Agent(
+            self.action_len,
+            is_sample_action,
+            is_BR,
+            eta,
+            is_using_history_regret,
+            is_regret_plus,
+            policy_update_mode
+        )
+
+        self.player2 = Agent(
+            self.action_len,
+            is_sample_action,
+            is_BR,
+            eta,
+            is_using_history_regret,
+            is_regret_plus,
+            policy_update_mode
+        )
+
+        self.player3 = Agent(
+            self.action_len,
+            is_sample_action,
+            is_BR,
+            eta,
+            is_using_history_regret,
+            is_regret_plus,
+            policy_update_mode
+        )
+
+    def iteration(self, iter_time):
+        for _ in range(iter_time):
+            interaction_policy1 = self.player1.get_interaction_policy()
+            interaction_policy2 = self.player2.get_interaction_policy()
+            interaction_policy3 = self.player3.get_interaction_policy()
+
+            action_value1 = np.matmul(self.game_matrix, interaction_policy2.reshape((-1, 1)))
+            action_value1 = action_value1.reshape(-1)
+
+            action_value2 = np.matmul(interaction_policy1, self.game_matrix)
+
+            self.player1.get_update_policy(action_value1)
+            self.player2.get_update_policy(-action_value2)
+
+            self.player1.policy_updates()
+            self.player2.policy_updates()
+
+    def get_epsilon(self, mode='his'):
+        if mode == 'his':
+            action_value2 = np.matmul(self.player1.get_history_policy(), self.game_matrix)
+            action_value1 = np.matmul(self.game_matrix, self.player2.get_history_policy().reshape((-1, 1)))
+
+            # game_v = np.sum(action_value2 * self.player2.get_history_policy())
+        elif mode == 'now':
+            action_value2 = np.matmul(self.player1.policy, self.game_matrix)
+            action_value1 = np.matmul(self.game_matrix, self.player2.policy.reshape((-1, 1)))
+            # game_v = np.sum(action_value2 * self.player2.policy)
+        else:
+            action_value1 = None
+            action_value2 = None
+            # game_v = 0
+        epsilon = np.max(action_value1) - np.min(action_value2)
+        return epsilon
+
 class FullCooperationGame(object):
     def __init__(
             self,
@@ -151,6 +229,77 @@ class FullCooperationGame(object):
         else:
             game_v = 0
         return game_v
+
+
+class NormalFromGame(object):
+    def __init__(
+            self,
+            action_len,
+            is_sample_action=False,
+            is_BR=True,
+            eta=1,
+            is_using_history_regret=True,
+            is_regret_plus=True,
+            policy_update_mode='Fictitious'
+    ):
+        self.name = 'normal_form'
+        self.game_matrix1 = np.random.randn(action_len, action_len)
+        self.game_matrix2 = np.random.randn(action_len, action_len)
+        self.action_len = action_len
+        self.player1 = Agent(
+            self.action_len,
+            is_sample_action,
+            is_BR,
+            eta,
+            is_using_history_regret,
+            is_regret_plus,
+            policy_update_mode
+        )
+
+        self.player2 = Agent(
+            self.action_len,
+            is_sample_action,
+            is_BR,
+            eta,
+            is_using_history_regret,
+            is_regret_plus,
+            policy_update_mode
+        )
+
+    def iteration(self, iter_time):
+        for _ in range(iter_time):
+            interaction_policy1 = self.player1.get_interaction_policy()
+            interaction_policy2 = self.player2.get_interaction_policy()
+
+            action_value1 = np.matmul(self.game_matrix1, interaction_policy2.reshape((-1, 1)))
+            action_value1 = action_value1.reshape(-1)
+
+            action_value2 = np.matmul(interaction_policy1, self.game_matrix2)
+
+            self.player1.get_update_policy(action_value1)
+            self.player2.get_update_policy(action_value2)
+
+            self.player1.policy_updates()
+            self.player2.policy_updates()
+
+    def get_epsilon(self, mode='his'):
+        if mode == 'his':
+            action_value2 = np.matmul(self.player1.get_history_policy(), self.game_matrix2)
+            action_value1 = np.matmul(self.game_matrix1, self.player2.get_history_policy().reshape((-1, 1)))
+            game_v1 = np.sum(action_value1.reshape(-1) * self.player1.get_history_policy())
+            game_v2 = np.sum(action_value2 * self.player2.get_history_policy())
+        elif mode == 'now':
+            action_value2 = np.matmul(self.player1.policy, self.game_matrix2)
+            action_value1 = np.matmul(self.game_matrix1, self.player2.policy.reshape((-1, 1)))
+            game_v1 = np.sum(action_value1.reshape(-1) * self.player1.policy)
+            game_v2 = np.sum(action_value2 * self.player2.policy)
+        else:
+            action_value1 = None
+            action_value2 = None
+            game_v1 = 0
+            game_v2 = 0
+        epsilon = np.max(action_value1) + np.max(action_value2) - game_v1 - game_v2
+        return epsilon
 
 
 class SymmetryGame(object):
