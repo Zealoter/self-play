@@ -148,10 +148,14 @@ class FastAgent(object):
     def get_update_policy(self, action_value: np.ndarray):
         mean_value = np.sum(self.policy * action_value)
         now_regret = action_value - mean_value
-        alpha = 1 - 2 / (self.train_times + 1)
 
+        # alpha = 1 - 2 / (1 + self.train_times)
+        # self.history_regret = (1 - alpha) * self.history_regret + alpha * now_regret
+
+        alpha = 2 / (1+self.train_times)
         self.history_regret = (1 - alpha) * self.history_regret + alpha * now_regret
 
+        # self.history_regret = now_regret
         tmp_cal_regret = np.maximum(self.history_regret, 0)
         if np.sum(tmp_cal_regret) == 0:
             self.update_policy = np.ones(self.action_num) / self.action_num
@@ -159,8 +163,13 @@ class FastAgent(object):
             self.update_policy = tmp_cal_regret / np.sum(tmp_cal_regret)
 
     def policy_updates(self):
-        alpha = 2 / (self.train_times + 1)
-        self.policy = (1 - alpha) * self.policy + alpha * self.update_policy
+        alpha = 2 / (1 + self.train_times)
+        # self.policy = (1 - alpha) * self.policy + alpha * self.update_policy
+        self.policy = self.update_policy
+        self.history_policy = (1 - alpha) * self.history_policy + alpha * self.policy
 
-        self.history_policy += self.policy
-
+    def get_setting(self):
+        param_list = [
+            'CFR++'
+        ]
+        return param_list

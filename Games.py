@@ -12,7 +12,7 @@ class FastZeroSumGame(object):
             self,
             action_len
     ):
-        self.name = 'zero_sum'
+        self.name = 'fast_zero_sum'
         self.game_matrix = np.random.randn(action_len, action_len)
         self.action_len = action_len
         self.player1 = FastAgent(
@@ -63,14 +63,14 @@ class FastZeroSumGame(object):
 
 class ZeroSumGame(object):
     def __init__(
-            self,
-            action_len,
-            is_sample_action=False,
-            is_BR=True,
-            eta=1,
-            is_using_history_regret=True,
-            is_regret_plus=True,
-            policy_update_mode='Fictitious'
+        self,
+        action_len,
+        is_sample_action=False,
+        is_BR=True,
+        eta=1,
+        is_using_history_regret=True,
+        is_regret_plus=True,
+        policy_update_mode='Fictitious'
     ):
         self.name = 'zero_sum'
         self.game_matrix = np.random.randn(action_len, action_len)

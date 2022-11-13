@@ -26,11 +26,10 @@ if __name__ == '__main__':
     #     is_using_history_regret_list for x5 in is_regret_plus_list for x6 in policy_update_mode_list
     # ]
     param_combination = [
-        (False, False, 16, True, False, 'Naive'),
-        (False, False, 16, False, False, 'Fictitious')
+        (False, False, 16, True, False, 'Naive')
     ]
     itr_num = 100
-    for act_len in [8]:
+    for act_len in [3]:
         print(act_len)
         for param in param_combination:
             print(param)
@@ -39,7 +38,7 @@ if __name__ == '__main__':
             now_epsilon_list = np.zeros(itr_num)
             # his_value_list = []
             # now_value_list = []
-            for i_game in range(2000):
+            for i_game in range(1000):
                 if i_game % 100 == 0:
                     print(i_game)
                 game = FastZeroSumGame(
@@ -52,8 +51,8 @@ if __name__ == '__main__':
                     # is_regret_plus=param[4],
                     # policy_update_mode=param[5]
                 )
-                # if not recode_list:
-                #     recode_list.extend(game.player1.get_setting())
+                if not recode_list:
+                    recode_list.extend(game.player1.get_setting())
 
                 tmp_epsilon = game.iteration(itr_num)
                 his_epsilon_list += tmp_epsilon
