@@ -115,3 +115,52 @@ class Agent(object):
             self.policy_update_mode.__str__()
         ]
         return param_list
+
+
+class FastAgent(object):
+    def __init__(
+            self,
+            action_num: int,
+
+    ):
+        """
+        __init__
+        :param action_num: 策略的长度
+
+        """
+        self.action_num = action_num
+        self.policy = np.random.random(self.action_num)
+        # self.policy = np.ones(self.action_num)
+        self.policy = self.policy / np.sum(self.policy)
+        self.history_policy = copy.deepcopy(self.policy)
+        self.train_times = 1
+
+        self.history_regret = np.zeros(self.action_num)
+        self.update_policy = np.zeros(self.action_num)
+
+    def get_history_policy(self) -> np.array:
+        return self.history_policy / np.sum(self.history_policy)
+
+    def get_interaction_policy(self) -> np.ndarray:
+        self.train_times += 1
+        return self.policy
+
+    def get_update_policy(self, action_value: np.ndarray):
+        mean_value = np.sum(self.policy * action_value)
+        now_regret = action_value - mean_value
+        alpha = 1 - 2 / (self.train_times + 1)
+
+        self.history_regret = (1 - alpha) * self.history_regret + alpha * now_regret
+
+        tmp_cal_regret = np.maximum(self.history_regret, 0)
+        if np.sum(tmp_cal_regret) == 0:
+            self.update_policy = np.ones(self.action_num) / self.action_num
+        else:
+            self.update_policy = tmp_cal_regret / np.sum(tmp_cal_regret)
+
+    def policy_updates(self):
+        alpha = 2 / (self.train_times + 1)
+        self.policy = (1 - alpha) * self.policy + alpha * self.update_policy
+
+        self.history_policy += self.policy
+

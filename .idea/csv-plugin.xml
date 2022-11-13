@@ -45,6 +45,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/log/zero_sum/8x8_game.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/log/zero_sum/8x8_game1000.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

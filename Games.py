@@ -4,7 +4,61 @@
 # @E-mail: 18672750887@163.com
 """
 import numpy as np
-from SP import Agent
+from SP import Agent, FastAgent
+
+
+class FastZeroSumGame(object):
+    def __init__(
+            self,
+            action_len
+    ):
+        self.name = 'zero_sum'
+        self.game_matrix = np.random.randn(action_len, action_len)
+        self.action_len = action_len
+        self.player1 = FastAgent(
+            self.action_len
+        )
+
+        self.player2 = FastAgent(
+            self.action_len
+        )
+
+    def iteration(self, iter_time):
+        epsilon_list = np.zeros(iter_time)
+        for i_itr in range(iter_time):
+            interaction_policy1 = self.player1.get_interaction_policy()
+            interaction_policy2 = self.player2.get_interaction_policy()
+
+            action_value1 = np.matmul(self.game_matrix, interaction_policy2.reshape((-1, 1)))
+            action_value1 = action_value1.reshape(-1)
+
+            action_value2 = np.matmul(interaction_policy1, self.game_matrix)
+
+            self.player1.get_update_policy(action_value1)
+            self.player2.get_update_policy(-action_value2)
+
+            self.player1.policy_updates()
+            self.player2.policy_updates()
+
+            epsilon_list[i_itr] = self.get_epsilon('his')
+        return epsilon_list
+
+    def get_epsilon(self, mode='his'):
+        if mode == 'his':
+            action_value2 = np.matmul(self.player1.get_history_policy(), self.game_matrix)
+            action_value1 = np.matmul(self.game_matrix, self.player2.get_history_policy().reshape((-1, 1)))
+
+            # game_v = np.sum(action_value2 * self.player2.get_history_policy())
+        elif mode == 'now':
+            action_value2 = np.matmul(self.player1.policy, self.game_matrix)
+            action_value1 = np.matmul(self.game_matrix, self.player2.policy.reshape((-1, 1)))
+            # game_v = np.sum(action_value2 * self.player2.policy)
+        else:
+            action_value1 = None
+            action_value2 = None
+            # game_v = 0
+        epsilon = np.max(action_value1) - np.min(action_value2)
+        return epsilon
 
 
 class ZeroSumGame(object):
@@ -42,7 +96,8 @@ class ZeroSumGame(object):
         )
 
     def iteration(self, iter_time):
-        for _ in range(iter_time):
+        epsilon_list = np.zeros(iter_time)
+        for i_itr in range(iter_time):
             interaction_policy1 = self.player1.get_interaction_policy()
             interaction_policy2 = self.player2.get_interaction_policy()
 
@@ -56,6 +111,9 @@ class ZeroSumGame(object):
 
             self.player1.policy_updates()
             self.player2.policy_updates()
+
+            epsilon_list[i_itr] = self.get_epsilon('his')
+        return epsilon_list
 
     def get_epsilon(self, mode='his'):
         if mode == 'his':
@@ -152,6 +210,7 @@ class ThreePlayerZeroSumGame(object):
             # game_v = 0
         epsilon = np.max(action_value1) - np.min(action_value2)
         return epsilon
+
 
 class FullCooperationGame(object):
     def __init__(
