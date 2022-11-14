@@ -3,6 +3,20 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/log/fast_zero_sum/3x3_game10.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/log/fast_zero_sum/6x6_game10.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/log/full_cooperation/1000x1000_game.csv">
           <value>
             <Attribute>
@@ -32,13 +46,6 @@
           </value>
         </entry>
         <entry key="/log/zero_sum/2x2_game.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/log/zero_sum/3x3_game100.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

@@ -28,8 +28,8 @@ if __name__ == '__main__':
     param_combination = [
         (False, False, 16, True, False, 'Naive')
     ]
-    itr_num = 100
-    for act_len in [3]:
+    itr_num = 10
+    for act_len in [6]:
         print(act_len)
         for param in param_combination:
             print(param)
@@ -38,8 +38,8 @@ if __name__ == '__main__':
             now_epsilon_list = np.zeros(itr_num)
             # his_value_list = []
             # now_value_list = []
-            for i_game in range(1000):
-                if i_game % 100 == 0:
+            for i_game in range(10000):
+                if i_game % 1000 == 0:
                     print(i_game)
                 game = FastZeroSumGame(
                     action_len=act_len
