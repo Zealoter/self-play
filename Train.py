@@ -5,7 +5,7 @@
 """
 import csv
 import numpy as np
-from Games import FullCooperationGame, ZeroSumGame, SymmetryGame, NormalFromGame, FastZeroSumGame
+from Games import FullCooperationGame, ZeroSumGame, SymmetryGame, NormalFromGame
 
 if __name__ == '__main__':
     # is_sample_action_list = [True]
@@ -41,7 +41,7 @@ if __name__ == '__main__':
             for i_game in range(10000):
                 if i_game % 1000 == 0:
                     print(i_game)
-                game = FastZeroSumGame(
+                game = FullCooperationGame(
                     action_len=act_len
                     # action_len=act_len,
                     # is_sample_action=param[0],
