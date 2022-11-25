@@ -114,3 +114,12 @@ class Agent(object):
             self.policy_update_mode.__str__()
         ]
         return param_list
+
+    def reset(self):
+        self.policy = np.random.random(self.action_num)
+        self.policy = self.policy / np.sum(self.policy)
+        self.history_policy = copy.deepcopy(self.policy)
+        self.train_times = 1
+
+        self.history_regret = np.zeros(self.action_num)
+        self.update_policy = np.zeros(self.action_num)
