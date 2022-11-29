@@ -11,21 +11,24 @@ import copy
 import csv
 
 
-
 class Game(object):
     def __init__(
             self,
             action_len
     ):
+        self.result_file_path = None
+        self.now_time_str = None
+        self.now_path_str = None
+        self.action_len = action_len
+        self.game_matrices = []
+        self.players = []
+        self.name = 'game'
+
+    def generate_path(self):
         self.now_path_str = os.getcwd()
         # 北京时间 东 8 区 +8
         self.now_time_str = time.strftime('%Y_%m_%d_%H_%M_%S', time.gmtime(time.time() + 8 * 60 * 60))
         self.result_file_path = ''.join([self.now_path_str, '/logCFR/', self.name, '_', self.now_time_str])
-
-        self.action_len = action_len
-
-        self.game_matrices = []
-        self.players = []
 
     def iteration(self, iter_time):
         pass
@@ -267,10 +270,11 @@ class SymmetryGame(Game):
         return epsilon
 
 
-class RPSGame(Game):
+class RPSGame(SymmetryGame):
     def __init__(self, action_len, is_sample_action=False, is_BR=True, eta=1, is_using_history_regret=True,
                  is_regret_plus=True, policy_update_mode='Fictitious'):
-        super().__init__(3)
+        super().__init__(action_len, is_sample_action, is_BR, eta, is_using_history_regret, is_regret_plus,
+                         policy_update_mode)
         self.name = 'RPS'
 
         self.game_matrices.append(
@@ -282,36 +286,3 @@ class RPSGame(Game):
                 ]
             )
         )
-
-        self.players.append(
-            Agent(
-                self.action_len,
-                is_sample_action,
-                is_BR,
-                eta,
-                is_using_history_regret,
-                is_regret_plus,
-                policy_update_mode
-            )
-        )
-
-    def iteration(self, iter_time):
-        for _ in range(iter_time):
-            interaction_policy = self.players[0].get_interaction_policy()
-            action_value = np.matmul(self.game_matrices[0], interaction_policy.reshape((-1, 1)))
-            action_value = action_value.reshape(-1)
-            self.players[0].get_update_policy(action_value)
-            self.players[0].policy_updates()
-
-    def get_epsilon(self, mode='his'):
-        if mode == 'his':
-            action_value = np.matmul(self.players[0].get_history_policy(), self.game_matrices[0])
-            game_v = np.sum(action_value * self.players[0].get_history_policy())
-        elif mode == 'now':
-            action_value = np.matmul(self.players[0].policy, self.game_matrices[0])
-            game_v = np.sum(action_value * self.players[0].policy)
-        else:
-            action_value = None
-            game_v = 0
-        epsilon = -np.min(action_value) - game_v
-        return epsilon
