@@ -11,15 +11,16 @@ import copy
 import csv
 
 
+
 class Game(object):
     def __init__(
             self,
             action_len
     ):
-        now_path_str = os.getcwd()
+        self.now_path_str = os.getcwd()
         # 北京时间 东 8 区 +8
-        now_time_str = time.strftime('%Y_%m_%d_%H_%M_%S', time.gmtime(time.time() + 8 * 60 * 60))
-        self.result_file_path = ''.join([now_path_str, '/logCFR/', self.name, '_', now_time_str])
+        self.now_time_str = time.strftime('%Y_%m_%d_%H_%M_%S', time.gmtime(time.time() + 8 * 60 * 60))
+        self.result_file_path = ''.join([self.now_path_str, '/logCFR/', self.name, '_', self.now_time_str])
 
         self.action_len = action_len
 
