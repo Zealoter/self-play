@@ -4,7 +4,7 @@
 # @E-mail: 18672750887@163.com
 """
 import numpy as np
-from SP import Agent
+from Agent import SPAgent
 import time
 import os
 import copy
@@ -48,7 +48,7 @@ class NormalFromGame(Game):
         for _ in range(2):
             self.game_matrices.append(np.random.randn(action_len, action_len))
             self.players.append(
-                Agent(
+                SPAgent(
                     self.action_len,
                     is_sample_action,
                     is_BR,
@@ -105,7 +105,7 @@ class ZeroSumGame(Game):
 
         for _ in range(2):
             self.players.append(
-                Agent(
+                SPAgent(
                     self.action_len,
                     is_sample_action,
                     is_BR,
@@ -271,15 +271,12 @@ class RPSGame(Game):
                  is_regret_plus=True, policy_update_mode='Fictitious'):
         super().__init__(3)
         self.name = 'RPS'
-
-        self.game_matrices.append(
-            np.array(
-                [
-                    [0, 1, -1],
-                    [-1, 0, 1],
-                    [1, -1, 0]
-                ]
-            )
+        self.game_matrices[0] = np.array(
+            [
+                [0, 1, -1],
+                [-1, 0, 1],
+                [1, -1, 0]
+            ]
         )
 
         self.players.append(

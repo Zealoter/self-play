@@ -8,7 +8,7 @@ import copy
 import numpy as np
 
 
-class Agent(object):
+class SPAgent(object):
     def __init__(
             self,
             action_num: int,
