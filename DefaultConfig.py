@@ -3,6 +3,7 @@
 # @Time  : 2022/11/30 17:22
 # @E-mail: 18672750887@163.com
 """
+# 测试
 DEFAULT_CONFIG = {
     'train_config':
         {
